@@ -1,0 +1,19 @@
+.container {
+  margin: 0 auto;
+  width: 900px;
+  padding: 10px;
+  border-radius: 20px;
+  margin-top: 30px;
+}
+
+.bisque {
+  background-color: bisque;
+}
+
+.white {
+  background-color: white;
+}
+
+.red {
+  background-color: red;
+}
