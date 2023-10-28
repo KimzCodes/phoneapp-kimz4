@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input, Button } from "../../form";
 
 const initState = {
@@ -8,8 +8,14 @@ const initState = {
   phone: "",
 };
 
-const UserForm = ({ addUser }) => {
+const UserForm = ({ userOperation, selectedUser }) => {
   const [form, setForm] = useState(initState);
+
+  useEffect(() => {
+    if (selectedUser.current && Object.keys(selectedUser.current).length > 0) {
+      setForm({ ...selectedUser.current });
+    }
+  }, [selectedUser]);
 
   const inputHandler = (event) => {
     const key = event.target.name;
@@ -22,7 +28,14 @@ const UserForm = ({ addUser }) => {
 
   const formHandler = (e) => {
     e.preventDefault();
-    addUser(form);
+    let userData = {};
+    if (form.id) {
+      userData = { ...form, type: "edit" };
+    } else {
+      const id = Math.floor(Math.random() * 100);
+      userData = { ...form, type: "insert", id };
+    }
+    userOperation(userData);
     setForm(initState);
   };
 

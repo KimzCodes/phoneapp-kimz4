@@ -18,7 +18,7 @@ const Modal = ({ children, show, close }) => {
           marginTop: 0,
           zIndex: 2,
         }}
-        variant="bisque"
+        variant="white"
       >
         {children}
       </Container>

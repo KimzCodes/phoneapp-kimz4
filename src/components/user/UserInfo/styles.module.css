@@ -14,12 +14,25 @@
   border: 1px solid red;
 }
 
+.actions {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
 .delBtn {
   width: 60px;
   text-align: center;
-  position: absolute;
   background: red;
-  right: 10px;
-  bottom: 10px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.editBtn {
+  width: 60px;
+  text-align: center;
+
+  background: green;
+
   cursor: pointer;
 }
