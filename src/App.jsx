@@ -1,17 +1,17 @@
-import { useState, useRef, useEffect } from "react";
-//js library
-import axios from "axios";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 // components
 import { UserForm, UserList } from "./components/user";
 import { Container, Modal } from "./components/layout";
 import { Button, Input } from "./components/form";
+import { Loading } from "./components/feedback";
+import useAPI from "./hooks/useAPI";
 
 const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [usersData, setUserData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { loading, error, callApi } = useAPI();
   const selectedUser = useRef(null);
 
   //1-one time after main init -> empty dependance
@@ -31,23 +31,32 @@ const App = () => {
 
   useEffect(() => {
     const getUsers = async () => {
-      try {
-        const response = await axios.get("http://localhost:5005/users");
-        setUserData(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
+      const res = await callApi({
+        method: "GET",
+        url: "http://localhost:5005/users",
+      });
+      setUserData(res.data);
     };
 
     getUsers();
-  }, []);
+  }, [callApi]);
 
-  const userOperation = (fromData) => {
+  const userOperation = async (fromData) => {
     if (fromData.type === "insert") {
       delete fromData.type;
       setUserData([...usersData, fromData]);
+
+      await callApi({
+        method: "POST",
+        url: "http://localhost:5005/users",
+        data: { ...fromData },
+      });
     } else {
+      await callApi({
+        method: "PATCH",
+        url: `http://localhost:5005/users/${fromData.id}`,
+        data: { ...fromData },
+      });
       const updatedUser = usersData.map((user) => {
         if (user.id === fromData.id) {
           return { ...user, ...fromData };
@@ -61,19 +70,38 @@ const App = () => {
     modalHandler();
   };
 
-  const modalHandler = () => {
+  const searchHandler = useCallback((event) => {
+    setSearch(event.target.value);
+  }, []);
+
+  const modalHandler = useCallback(() => {
     setShowModal((prev) => !prev);
-  };
+  }, []);
 
-  const deleteHandler = (id) => {
-    const filterUser = usersData.filter((el) => el.id !== id);
-    setUserData(filterUser);
-  };
+  const deleteHandler = useCallback(
+    async (id) => {
+      try {
+        await callApi({
+          method: "DELETE",
+          url: `http://localhost:5005/users/${id}`,
+        });
 
-  const selectUserHandler = (id) => {
-    selectedUser.current = usersData.find((el) => el.id === id);
-    modalHandler();
-  };
+        const filterUser = usersData.filter((el) => el.id !== id);
+        setUserData(filterUser);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [usersData, callApi]
+  );
+
+  const selectUserHandler = useCallback(
+    (id) => {
+      selectedUser.current = usersData.find((el) => el.id === id);
+      modalHandler();
+    },
+    [usersData, modalHandler]
+  );
 
   return (
     <>
@@ -89,18 +117,17 @@ const App = () => {
           name="search"
           placeholder="search"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={searchHandler}
         />
-        {loading ? (
-          "loading please wait..."
-        ) : (
+
+        <Loading loading={loading} error={error}>
           <UserList
             users={usersData}
             search={search}
             deleteHandler={deleteHandler}
             selectUserHandler={selectUserHandler}
           />
-        )}
+        </Loading>
       </Container>
     </>
   );

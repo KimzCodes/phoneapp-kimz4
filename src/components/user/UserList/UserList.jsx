@@ -1,6 +1,8 @@
+import { memo } from "react";
 import UserInfo from "../UserInfo/UserInfo";
 
 const UserList = ({ users, deleteHandler, search, selectUserHandler }) => {
+  console.log(users);
   const usersList = users
     .filter((user) => user.name.includes(search))
     .map((user) => (
@@ -14,4 +16,4 @@ const UserList = ({ users, deleteHandler, search, selectUserHandler }) => {
   return <div>{usersList}</div>;
 };
 
-export default UserList;
+export default memo(UserList);

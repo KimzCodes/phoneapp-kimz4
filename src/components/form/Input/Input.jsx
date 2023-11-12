@@ -1,3 +1,4 @@
+import { memo } from "react";
 import styles from "./styles.module.css";
 
 const Input = ({ type, name, value, onChange, label, placeholder }) => {
@@ -15,4 +16,4 @@ const Input = ({ type, name, value, onChange, label, placeholder }) => {
   );
 };
 
-export default Input;
+export default memo(Input);

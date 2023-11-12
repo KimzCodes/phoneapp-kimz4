@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Container from "../Container/Container";
 import styles from "./styles.module.css";
 
@@ -26,4 +27,4 @@ const Modal = ({ children, show, close }) => {
   );
 };
 
-export default Modal;
+export default memo(Modal);
